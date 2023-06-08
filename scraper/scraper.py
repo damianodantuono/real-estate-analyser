@@ -1,7 +1,8 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-import requests
-from url_handler.url_builder import SellOrRent, Criteria, Order, build_url
+from url_builder import build_url
+from models.criteria import Criteria
+from models.order import Order
 from models.house import House
 import asyncio
 import aiohttp
@@ -70,7 +71,7 @@ async def map_houses(raw_result: str) -> list[House]:
     return list(processed_list)
 
 
-async def scrape(sell_or_rent: SellOrRent, city: str, zone: str = '') -> pd.DataFrame:
+async def scrape(sell_or_rent: str, city: str, zone: str = '') -> pd.DataFrame:
     raw_results = await extract(sell_or_rent, city, zone)
     tasks = [asyncio.create_task(map_houses(raw_result)) for raw_result in raw_results]
     houses = await asyncio.gather(*tasks)
