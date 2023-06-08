@@ -52,7 +52,7 @@ def main():
     for city, zone, sell_or_rent in cities_to_ingest:
         print(f"Running scraper for city: {city}, zone: {zone}, sell/rent: {sell_or_rent}")
         run_scraper(sell_or_rent=sell_or_rent, city=city, zone=zone)
-
+        break
 
 if __name__ == '__main__':
     main()
