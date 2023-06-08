@@ -54,5 +54,4 @@ def main():
         run_scraper(sell_or_rent=sell_or_rent, city=city, zone=zone)
 
 
-if __name__ == '__main__':
-    main()
+main()
