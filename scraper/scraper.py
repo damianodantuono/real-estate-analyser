@@ -1,11 +1,12 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-from url_builder import build_url
-from models.criteria import Criteria
-from models.order import Order
-from models.house import House
+from scraper.url_builder import build_url
+from scraper.models.criteria import Criteria
+from scraper.models.order import Order
+from scraper.models.house import House
 import asyncio
 import aiohttp
+import re
 
 
 async def fetch(url):
@@ -16,7 +17,7 @@ async def fetch(url):
             return await response.text()
 
 
-async def extract_maximum_page(sell_or_rent: SellOrRent, city: str, zone: str = '') -> int:
+async def extract_maximum_page(sell_or_rent: str, city: str, zone: str = '') -> int:
     url = build_url(sell_or_rent=sell_or_rent, city=city, criteria=Criteria.LAST_UPDATE, page=1, order=Order.DESC, zone=zone)
     raw_response = await fetch(url)
     soup = BeautifulSoup(raw_response, 'html.parser')
@@ -25,12 +26,18 @@ async def extract_maximum_page(sell_or_rent: SellOrRent, city: str, zone: str = 
         # check if div.text is a number
         if div.text.isnumeric():
             return int(div.text)
+    else:
+        regex = url.split("/")[-1].strip("?").replace("pag=1", "").replace("&", "&amp;")
+        pattern = re.compile(regex + r"pag=(\d+)")
+        if matches := pattern.findall(raw_response):
+            matches = map(int, matches)
+            return max(matches)
     return 1
 
 
-async def extract(sell_or_rent: SellOrRent, city: str, zone: str = '') -> list[str]:
+async def extract(sell_or_rent: str, city: str, zone: str = '') -> list[str]:
     maximum_page: int = await extract_maximum_page(sell_or_rent, city, zone)
-    print("Maximum page: " + str(maximum_page))
+    print("Maximum page: ", maximum_page)
     urls = [build_url(sell_or_rent=sell_or_rent, city=city, criteria=Criteria.LAST_UPDATE, page=i, order=Order.DESC, zone=zone) for i in range(1, maximum_page + 1)]
     tasks = [asyncio.create_task(fetch(url)) for url in urls]
     raw_results = await asyncio.gather(*tasks)
