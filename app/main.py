@@ -37,7 +37,7 @@ def run_scraper(sell_or_rent: str, city: str, zone: str = '') -> pd.DataFrame:
 
 def process_data(df: pd.DataFrame) -> pd.DataFrame:
     df['price'] = np.where(df['price'] == 'N/A', '-1', df['price'])
-    df['price'] = df['price'].replace({'€': '', 'da': '', ',00': '', r'\.': '', '?/mese': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
+    df['price'] = df['price'].replace({'€': '', 'da': '', ',00': '', r'\.': '', 'mese': '', '/': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
 
     df['surface'] = np.where(df['surface'] == 'N/A', '-1', df['surface'])
     df['surface'] = df['surface'].replace({'m²': '', r'\.': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
@@ -73,7 +73,8 @@ def main():
         print(f"Running scraper for city: {city}, zone: {zone}, sell/rent: {sell_or_rent}")
         raw_df = run_scraper(sell_or_rent=sell_or_rent, city=city, zone=zone)
         df = process_data(raw_df)
-        write_to_gcs(df, city, zone)
+        # write_to_gcs(df, city, zone)
+        print(df)
 
 
 main()
