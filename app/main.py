@@ -73,7 +73,7 @@ def main():
         print(f"Running scraper for city: {city}, zone: {zone}, sell/rent: {sell_or_rent}")
         raw_df = run_scraper(sell_or_rent=sell_or_rent, city=city, zone=zone)
         df = process_data(raw_df)
-        # write_to_gcs(df, city, zone)
+        write_to_gcs(df, city, zone)
 
 
 main()
