@@ -74,7 +74,6 @@ def main():
         raw_df = run_scraper(sell_or_rent=sell_or_rent, city=city, zone=zone)
         df = process_data(raw_df)
         # write_to_gcs(df, city, zone)
-        print(df)
 
 
 main()
