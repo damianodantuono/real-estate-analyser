@@ -32,9 +32,6 @@ def run_scraper(sell_or_rent: str, city: str, zone: str = ''):
     today = pendulum.today().format("YYYYMMDD")
     data = asyncio.run(scrape(sell_or_rent=sell_or_rent, city=city, zone=zone))
 
-    data["city"] = city
-    data["zone"] = zone
-
     # write to bytes buffer parquet file
     buffer = BytesIO()
     data.to_parquet(buffer, engine="pyarrow", index=False, compression="gzip")
