@@ -17,3 +17,8 @@ class GCSInterface:
         blob = self.bucket.blob(destination_blob_name)
         blob.upload_from_string(string)
         print(f"String uploaded to {destination_blob_name}.")
+
+    def read_from_bytes(self, blob_name: str):
+        blob = self.bucket.blob(blob_name)
+        return blob.download_as_string()
+

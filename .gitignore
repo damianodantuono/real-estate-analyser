@@ -185,3 +185,4 @@ fabric.properties
 .idea
 **/*.csv
 credentials/*
+app/credential.json
