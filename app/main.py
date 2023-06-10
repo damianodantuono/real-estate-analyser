@@ -1,5 +1,5 @@
-from app.module_scraping.scraper import scrape
-from app.gcloud_interface.cloud_storage_interface import GCSInterface
+from module_scraping.scraper import scrape
+from gcloud_interface.cloud_storage_interface import GCSInterface
 import asyncio
 import argparse
 from io import BytesIO
