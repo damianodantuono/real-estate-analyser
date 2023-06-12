@@ -19,7 +19,7 @@ if '__main__' == __name__:
     city = args.city
     is_rent = args.is_rent
     bucket = args.bucket
-    prefix = args.prefix + '/' + city + '/' + "rent" if is_rent else "sell"
+    prefix = args.prefix + '/' + city + '_' + "rent" if is_rent else "sell"
     dry_run = args.dry_run
     filename = pendulum.today().format("YYYYMMDD") + ".parquet.gzip"
 
@@ -35,7 +35,7 @@ if '__main__' == __name__:
     file_size = round(stream.getbuffer().nbytes / 1024, 2)
 
     if not dry_run:
-        gsi.upload_from_bytes(stream.read(), prefix + '/' + filename)
+        gsi.upload_from_bytes(stream.read(), prefix + '_' + filename)
         print(f"Loaded to bucket {bucket} with prefix {prefix} and filename {filename}.\n"
               f"File size: {file_size} KB")
     else:
