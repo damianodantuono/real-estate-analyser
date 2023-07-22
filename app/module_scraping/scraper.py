@@ -29,14 +29,14 @@ async def extract_single_page(url: str) -> str:
 def map_houses(raw_result: str) -> list[House]:
     soup = BeautifulSoup(raw_result, 'html.parser')
     raw_list = soup \
-        .find("ul", {'data-cy' : 'result-list'}) \
+        .find("ul", {'data-cy': 'result-list'}) \
         .find_all("li", class_="nd-list__item in-realEstateResults__item", recursive=False)
+
     def process_single_li_element(li) -> House:
         anchor = li.find("a", class_="in-card__title")
         property_id = int(anchor["href"].rstrip("/").split("/")[-1])
         title = anchor.text
-        price = li.find("li", class_="nd-list__item in-feat__item in-feat__item--main "
-                                     "in-realEstateListCard__features--main")
+        price = li.find("li", class_="in-realEstateListCard__priceOnTop")
         surface = li.find("li", {"aria-label": "superficie"})
         rooms = li.find("li", {"aria-label": "locali"})
         bathrooms = li.find("li", {"aria-label": "bagni"})
@@ -64,16 +64,19 @@ def map_houses(raw_result: str) -> list[House]:
 
 def process_data(df: pd.DataFrame) -> pd.DataFrame:
     df['PRICE'] = np.where(df['PRICE'] == 'N/A', '-1', df['PRICE'])
-    df['PRICE'] = df['PRICE'].replace({'€': '', 'da': '', ',00': '', r'\.': '', 'mese': '', '/': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
+    df['PRICE'] = df['PRICE'].replace({'€': '', 'da': '', ',00': '', r'\.': '', 'mese': '', '/': ''}, regex=True).apply(
+        str.split).apply(lambda x: x[0]).astype(int)
 
     df['SURFACE'] = np.where(df['SURFACE'] == 'N/A', '-1', df['SURFACE'])
-    df['SURFACE'] = df['SURFACE'].replace({'m²': '', r'\.': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
+    df['SURFACE'] = df['SURFACE'].replace({'m²': '', r'\.': ''}, regex=True).apply(str.split).apply(
+        lambda x: x[0]).astype(int)
 
     df['ROOMS'] = np.where(df['ROOMS'] == 'N/A', '-1', df['ROOMS'])
     df['ROOMS'] = df['ROOMS'].replace({r'\+': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
 
     df['BATHROOMS'] = np.where(df['BATHROOMS'] == 'N/A', '-1', df['BATHROOMS'])
-    df['BATHROOMS'] = df['BATHROOMS'].replace({r'\+': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
+    df['BATHROOMS'] = df['BATHROOMS'].replace({r'\+': ''}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(
+        int)
 
     df['FLOOR'] = np.where(df['FLOOR'] == 'N/A', '-1', df['FLOOR'])
     df['FLOOR'] = df['FLOOR'].replace({r'T|R|S': '0'}, regex=True).apply(str.split).apply(lambda x: x[0]).astype(int)
