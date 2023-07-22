@@ -5,6 +5,7 @@ from module_scraping.website_interface import build_url, fetch
 from module_scraping.model_house import House
 import asyncio
 import re
+import math
 
 RESULTS_PER_PAGE = 25
 
@@ -18,7 +19,7 @@ def scrape_maximum_page(raw_response: str) -> int:
     if text is None:
         return 1
     number_of_results = int(re.search(r"\d+", text).group(0))
-    return (number_of_results // RESULTS_PER_PAGE) + 1
+    return math.ceil(number_of_results // RESULTS_PER_PAGE)
 
 
 async def extract_single_page(url: str) -> str:

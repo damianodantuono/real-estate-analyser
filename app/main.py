@@ -19,9 +19,8 @@ if '__main__' == __name__:
     city = args.city
     is_rent = args.is_rent
     bucket = args.bucket
-    prefix = args.prefix + '/' + city + '/' + "rent" if is_rent else "sell"
+    prefix = args.prefix + '/' + city + '_' + ("rent" if is_rent else "sell") + '_' + pendulum.today().format("YYYYMMDD") + ".parquet.gzip"
     dry_run = args.dry_run
-    filename = pendulum.today().format("YYYYMMDD") + ".parquet.gzip"
 
     print(f"Running scraper for {'rent' if is_rent else 'sell'} in {city}")
 
@@ -34,10 +33,9 @@ if '__main__' == __name__:
     stream.seek(0)
     file_size = round(stream.getbuffer().nbytes / 1024, 2)
 
+    message = f"{'Would upload' if dry_run else 'Uploaded'} to bucket {bucket} @ location {prefix}.\nFile size: {file_size} KB"
+
     if not dry_run:
-        gsi.upload_from_bytes(stream.read(), prefix + '/' + filename)
-        print(f"Loaded to bucket {bucket} with prefix {prefix} and filename {filename}.\n"
-              f"File size: {file_size} KB")
-    else:
-        print(f"Would upload to bucket {bucket} with prefix {prefix} and filename {filename}.\n"
-              f"File size: {file_size} KB")
+        gsi.upload_from_bytes(stream.read(), prefix)
+
+    print(message)
