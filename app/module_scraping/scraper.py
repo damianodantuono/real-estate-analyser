@@ -12,14 +12,14 @@ RESULTS_PER_PAGE = 25
 
 def scrape_maximum_page(raw_response: str) -> int:
     soup = BeautifulSoup(raw_response, 'html.parser')
-    div = soup.find("div", class_="in-searchList__title")
+    div = soup.find("div", class_="in-searchList__title is-listMapLayout")
     if div is None:
         return 1
     text = div.text
     if text is None:
         return 1
     number_of_results = int(re.search(r"\d+", text).group(0))
-    return math.ceil(number_of_results // RESULTS_PER_PAGE)
+    return math.ceil(number_of_results / RESULTS_PER_PAGE)
 
 
 async def extract_single_page(url: str) -> str:
@@ -37,7 +37,7 @@ def map_houses(raw_result: str) -> list[House]:
         anchor = li.find("a", class_="in-card__title")
         property_id = int(anchor["href"].rstrip("/").split("/")[-1])
         title = anchor.text
-        price = li.find("li", class_="in-realEstateListCard__priceOnTop")
+        price = li.find("div", class_="in-realEstateListCard__priceOnTop")
         surface = li.find("li", {"aria-label": "superficie"})
         rooms = li.find("li", {"aria-label": "locali"})
         bathrooms = li.find("li", {"aria-label": "bagni"})
@@ -64,7 +64,7 @@ def map_houses(raw_result: str) -> list[House]:
 
 
 def process_data(df: pd.DataFrame) -> pd.DataFrame:
-    df['PRICE'] = np.where(df['PRICE'] == 'N/A', '-1', df['PRICE'])
+    df['PRICE'] = np.where((df['PRICE'] == 'N/A') | (df['PRICE'] == 'Prezzo su richiesta'), '-1', df['PRICE'])
     df['PRICE'] = df['PRICE'].replace({'€': '', 'da': '', ',00': '', r'\.': '', 'mese': '', '/': ''}, regex=True).apply(
         str.split).apply(lambda x: x[0]).astype(int)
 

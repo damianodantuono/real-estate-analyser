@@ -37,5 +37,7 @@ if '__main__' == __name__:
 
     if not dry_run:
         gsi.upload_from_bytes(stream.read(), prefix)
+    else:
+        df.to_csv("test.csv", index=False)
 
     print(message)
